@@ -16,7 +16,7 @@ let apple = { x: 5, y: 5 };
 let score = 0;
 let highScore = 0;
 let gameInterval = null;
-let speed = 8;
+let speed = 5; // Slower initial speed
 let isRunning = false;
 let nextDirection = { x: 0, y: 0 };
 
@@ -31,7 +31,7 @@ function resetGame() {
   nextDirection = { x: 0, y: 0 };
   apple = randomApplePosition();
   score = 0;
-  speed = 8;
+  speed = 5; // Slower reset speed
   scoreEl.textContent = score;
   updateHighScore();
   isRunning = false;
@@ -91,7 +91,7 @@ function gameLoop() {
 
   if (head.x === apple.x && head.y === apple.y) {
     score += 10;
-    speed = Math.min(18, 8 + Math.floor(score / 30));
+    speed = Math.min(18, 5 + Math.floor(score / 40)); // Slower ramp-up
     scoreEl.textContent = score;
     updateHighScore();
     apple = randomApplePosition();
@@ -177,3 +177,4 @@ restartButton.addEventListener('click', restartGame);
 
 resetGame();
 draw();
+
