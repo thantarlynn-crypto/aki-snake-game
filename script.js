@@ -16,7 +16,10 @@ let apple = { x: 5, y: 5 };
 let score = 0;
 let highScore = 0;
 let gameInterval = null;
-let speed = 5; // Slower initial speed
+
+// Slower starting speed
+let speed = 2.5;
+
 let isRunning = false;
 let nextDirection = { x: 0, y: 0 };
 
@@ -31,7 +34,10 @@ function resetGame() {
   nextDirection = { x: 0, y: 0 };
   apple = randomApplePosition();
   score = 0;
-  speed = 5; // Slower reset speed
+
+  // Reset to slower speed
+  speed = 2.5;
+
   scoreEl.textContent = score;
   updateHighScore();
   isRunning = false;
@@ -40,10 +46,13 @@ function resetGame() {
 
 function startGame() {
   if (isRunning) return;
+
   isRunning = true;
   hideOverlay();
+
   velocity = { x: 1, y: 0 };
   nextDirection = { x: 1, y: 0 };
+
   gameInterval = setInterval(gameLoop, 1000 / speed);
 }
 
@@ -64,12 +73,19 @@ function hideOverlay() {
 
 function randomApplePosition() {
   let position;
+
   do {
     position = {
       x: Math.floor(Math.random() * tileCount),
       y: Math.floor(Math.random() * tileCount),
     };
-  } while (snake.some(segment => segment.x === position.x && segment.y === position.y));
+  } while (
+    snake.some(segment =>
+      segment.x === position.x &&
+      segment.y === position.y
+    )
+  );
+
   return position;
 }
 
@@ -80,7 +96,11 @@ function updateHighScore() {
 
 function gameLoop() {
   velocity = nextDirection;
-  const head = { x: snake[0].x + velocity.x, y: snake[0].y + velocity.y };
+
+  const head = {
+    x: snake[0].x + velocity.x,
+    y: snake[0].y + velocity.y
+  };
 
   if (hasCollision(head)) {
     endGame();
@@ -91,11 +111,16 @@ function gameLoop() {
 
   if (head.x === apple.x && head.y === apple.y) {
     score += 10;
-    speed = Math.min(18, 5 + Math.floor(score / 40)); // Slower ramp-up
+
+    // Slower speed increase
+    speed = Math.min(8, 2.5 + Math.floor(score / 50));
+
     scoreEl.textContent = score;
     updateHighScore();
+
     apple = randomApplePosition();
     playSound(sounds.eat);
+
     clearInterval(gameInterval);
     gameInterval = setInterval(gameLoop, 1000 / speed);
   } else {
@@ -106,27 +131,41 @@ function gameLoop() {
 }
 
 function hasCollision(head) {
-  const hitWall = head.x < 0 || head.x >= tileCount || head.y < 0 || head.y >= tileCount;
-  const hitSelf = snake.some(segment => segment.x === head.x && segment.y === head.y);
+  const hitWall =
+    head.x < 0 ||
+    head.x >= tileCount ||
+    head.y < 0 ||
+    head.y >= tileCount;
+
+  const hitSelf = snake.some(
+    segment =>
+      segment.x === head.x &&
+      segment.y === head.y
+  );
+
   return hitWall || hitSelf;
 }
 
 function endGame() {
   clearInterval(gameInterval);
   isRunning = false;
+
   playSound(sounds.die);
   updateHighScore();
+
   showOverlay('Game over! Press Restart to play again.');
 }
 
 function drawGrid() {
   ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
   ctx.lineWidth = 1;
+
   for (let i = 0; i <= tileCount; i++) {
     ctx.beginPath();
     ctx.moveTo(i * tileSize, 0);
     ctx.lineTo(i * tileSize, canvas.height);
     ctx.stroke();
+
     ctx.beginPath();
     ctx.moveTo(0, i * tileSize);
     ctx.lineTo(canvas.width, i * tileSize);
@@ -141,18 +180,32 @@ function draw() {
   drawGrid();
 
   ctx.fillStyle = '#f87171';
-  ctx.fillRect(apple.x * tileSize + 1, apple.y * tileSize + 1, tileSize - 2, tileSize - 2);
+  ctx.fillRect(
+    apple.x * tileSize + 1,
+    apple.y * tileSize + 1,
+    tileSize - 2,
+    tileSize - 2
+  );
 
   for (let i = 0; i < snake.length; i++) {
-    ctx.fillStyle = i === 0 ? '#22c55e' : '#4ade80';
-    ctx.fillRect(snake[i].x * tileSize + 2, snake[i].y * tileSize + 2, tileSize - 4, tileSize - 4);
+    ctx.fillStyle =
+      i === 0 ? '#22c55e' : '#4ade80';
+
+    ctx.fillRect(
+      snake[i].x * tileSize + 2,
+      snake[i].y * tileSize + 2,
+      tileSize - 4,
+      tileSize - 4
+    );
   }
 }
 
 function playSound(sound) {
   if (!sound) return;
+
   sound.currentTime = 0;
   sound.volume = 0.2;
+
   sound.play().catch(() => {});
 }
 
@@ -165,10 +218,16 @@ window.addEventListener('keydown', event => {
   };
 
   const direction = keyMap[event.key];
+
   if (!direction) return;
+
   event.preventDefault();
 
-  if (direction.x === -velocity.x && direction.y === -velocity.y) return;
+  if (
+    direction.x === -velocity.x &&
+    direction.y === -velocity.y
+  ) return;
+
   nextDirection = direction;
 });
 
@@ -177,4 +236,3 @@ restartButton.addEventListener('click', restartGame);
 
 resetGame();
 draw();
-
